@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Alimentador Automático - Interativo (Mobile)</title>
+  <meta name="description" content="Projeto acadêmico com interface móvel interativa: abas, cards e modo escuro.">
+  <style>
+    :root{
+      --brand:#00416A;
+      --accent:#FFB74D;
+      --bg:#f7f8fb;
+      --card:#ffffff;
+      --text:#1f2933;
+      --gap:16px;
+      --touch:48px;
+      --radius:12px;
+
+      /* Cores das abas (novo) */
+      --tab-selected-color: #1b3b5a;   /* cor do texto da aba selecionada */
+      --tab-unselected-color: #ffffff; /* cor do texto das abas não selecionadas */
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background:var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      padding-bottom:env(safe-area-inset-bottom);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Header */
+    header{
+      position:sticky; top:0; z-index:1000;
+      display:flex; align-items:center; gap:12px;
+      background:linear-gradient(90deg,var(--brand),#00658f);
+      color:#fff; padding:12px;
+    }
+    .brand{font-weight:700; font-size:1rem}
+    .controls{margin-left:auto; display:flex; gap:8px; align-items:center}
+    .icon-btn{
+      width:var(--touch); height:var(--touch); min-width:var(--touch);
+      display:inline-flex; align-items:center; justify-content:center;
+      background:transparent; border:0; color:#fff; border-radius:10px;
+    }
+
+    /* Container */
+    main{padding:16px; max-width:900px; margin:0 auto}
+
+    /* Abas (tabs) */
+    .tabs{
+      display:flex; gap:8px; overflow:auto; padding-bottom:8px;
+      margin-bottom:12px;
+    }
+    .tab{
+      flex:0 0 auto;
+      background:rgba(255,255,255,0.08);
+      color: var(--tab-unselected-color);
+      padding:10px 14px; border-radius:999px;
+      font-weight:600; font-size:.95rem; cursor:pointer;
+      border:2px solid transparent;
+      transition: color .18s ease, background .18s ease, box-shadow .18s ease;
+    }
+    .tab[aria-selected="true"]{
+      background:#fff;
+      color: var(--tab-selected-color);
+      border-color:rgba(0,0,0,0.06);
+      box-shadow:0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    /* Painéis de conteúdo */
+    .panel{display:none; animation:fadeIn .28s ease both}
+    .panel[aria-hidden="false"]{display:block}
+
+    /* Cards interativos */
+    .cards{display:grid; grid-template-columns:repeat(2,1fr); gap:12px}
+    .card{
+      background:var(--card); border-radius:var(--radius); padding:12px;
+      box-shadow:0 6px 18px rgba(16,24,40,0.06);
+      transform-origin:center; transition:transform .18s ease, box-shadow .18s ease;
+      min-height:110px; display:flex; flex-direction:column; justify-content:space-between;
+    }
+    .card:active{transform:translateY(2px) scale(.998)}
+    .card:hover{transform:translateY(-6px); box-shadow:0 18px 30px rgba(16,24,40,0.08)}
+    .card h3{margin:0 0 6px; font-size:1rem}
+    .card p{margin:0; font-size:.9rem; color:#555}
+
+    /* Accordion para leitura por sessão */
+    .accordion{margin-top:12px}
+    .acc-item{background:var(--card); border-radius:10px; margin-bottom:10px; overflow:hidden}
+    .acc-btn{
+      width:100%; display:flex; align-items:center; justify-content:space-between;
+      padding:12px; background:transparent; border:0; font-weight:700; font-size:.95rem;
+      cursor:pointer;
+    }
+    .acc-panel{padding:12px 12px 18px; border-top:1px solid #eee; display:none}
+    .acc-panel[aria-hidden="false"]{display:block}
+
+    /* Visual flair */
+    .hero{
+      background:linear-gradient(180deg, rgba(255,255,255,0.06), transparent);
+      border-radius:12px; padding:14px; margin-bottom:12px;
+      display:flex; gap:12px; align-items:center;
+    }
+    .hero .emoji{font-size:1.8rem}
+    .hero .text{flex:1}
+    .cta{
+      display:inline-block; background:var(--accent); color:#111; padding:8px 12px;
+      border-radius:10px; font-weight:700; text-decoration:none;
+    }
+
+    /* Dark mode toggle (visual only) */
+    .dark body{ --bg:#071022; --card:#071827; --text:#e6eef6; --brand:#1fb6ff; }
+
+    /* Responsividade */
+    @media (max-width:520px){
+      .cards{grid-template-columns:1fr}
+      .tab{padding:10px}
+    }
+
+    /* Acessibilidade e preferências */
+    :focus{outline:3px solid #ffd54f; outline-offset:3px}
+    @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+    @keyframes fadeIn{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">Alimentador Automático</div>
+    <div class="controls">
+      <button class="icon-btn" id="toggleTheme" aria-pressed="false" title="Alternar tema">🌓</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero para engajar -->
+    <div class="hero" role="region" aria-label="Resumo do projeto">
+      <div class="emoji">🐾</div>
+      <div class="text">
+        <strong>Conheça o protótipo</strong>
+        <div style="font-size:.95rem;color:#556">Escolha uma aba para explorar: visão geral, técnica, resultados e mais.</div>
+      </div>
+      <a class="cta" href="#metodologia">Ver protótipo</a>
+    </div>
+
+    <!-- Abas: usuário escolhe o que quer ler -->
+    <div class="tabs" role="tablist" aria-label="Seções do projeto">
+      <button class="tab" role="tab" aria-selected="true" data-target="overview">Visão Geral</button>
+      <button class="tab" role="tab" aria-selected="false" data-target="tech">Técnica</button>
+      <button class="tab" role="tab" aria-selected="false" data-target="tests">Testes</button>
+      <button class="tab" role="tab" aria-selected="false" data-target="gallery">Galeria</button>
+      <button class="tab" role="tab" aria-selected="false" data-target="faq">FAQ</button>
+    </div>
+
+    <!-- Painéis correspondentes -->
+    <section id="overview" class="panel" aria-hidden="false" role="tabpanel">
+      <h2>Visão Geral</h2>
+      <p>Resumo rápido do projeto, objetivos e benefícios para donos de pets. Ideal para quem quer entender sem detalhes técnicos.</p>
+
+      <div class="cards" aria-hidden="false">
+        <article class="card" tabindex="0">
+          <div>
+            <h3>Automação simples</h3>
+            <p>Dosagem precisa com motor controlado por microcontrolador.</p>
+          </div>
+          <div style="font-size:.85rem;color:#888">Duração: protótipo</div>
+        </article>
+
+        <article class="card" tabindex="0">
+          <div>
+            <h3>Baixo custo</h3>
+            <p>Componentes acessíveis e montagem modular.</p>
+          </div>
+          <div style="font-size:.85rem;color:#888">Custo estimado: R$</div>
+        </article>
+      </div>
+
+      <!-- Accordion: permite escolher sub-seções para leitura -->
+      <div class="accordion" aria-label="Leia mais">
+        <div class="acc-item">
+          <button class="acc-btn" aria-expanded="false">Por que automatizar?<span>+</span></button>
+          <div class="acc-panel" aria-hidden="true">
+            <p>Automação reduz esquecimentos, mantém rotina e evita desperdício.</p>
+          </div>
+        </div>
+
+        <div class="acc-item">
+          <button class="acc-btn" aria-expanded="false">Benefícios para pets<span>+</span></button>
+          <div class="acc-panel" aria-hidden="true">
+            <p>Alimentação regular melhora digestão e comportamento.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tech" class="panel" aria-hidden="true" role="tabpanel">
+      <h2>Técnica</h2>
+      <p>Componentes, esquemas e lógica de controle. Ideal para quem quer replicar ou melhorar o protótipo.</p>
+
+      <ul style="padding-left:18px;margin-top:8px">
+        <li>Microcontrolador: ESP32 / Arduino</li>
+        <li>Motor: passo a passo ou servo</li>
+        <li>Sensores: peso ou sensor de fluxo</li>
+      </ul>
+
+      <div style="margin-top:12px">
+        <a class="cta" href="#metodologia">Ver metodologia</a>
+      </div>
+    </section>
+
+    <section id="tests" class="panel" aria-hidden="true" role="tabpanel">
+      <h2>Testes e Resultados</h2>
+      <p>Resumo dos experimentos, tabelas de precisão e observações práticas.</p>
+
+      <div class="cards" style="margin-top:10px">
+        <article class="card" tabindex="0">
+          <div><h3>Precisão</h3><p>Erro médio: 3% por porção.</p></div>
+          <div style="font-size:.85rem;color:#888">Calibração necessária</div>
+        </article>
+        <article class="card" tabindex="0">
+          <div><h3>Confiabilidade</h3><p>Operação contínua por 30 dias em testes.</p></div>
+          <div style="font-size:.85rem;color:#888">Logs disponíveis</div>
+        </article>
+      </div>
+    </section>
+
+    <section id="gallery" class="panel" aria-hidden="true" role="tabpanel">
+      <h2>Galeria</h2>
+      <p>Imagens e infográficos do protótipo.</p>
+      <img src="infografico.png" alt="Infografico do Alimentador" style="width:100%;border-radius:10px;margin-top:10px" width="800" height="450" loading="lazy">
+    </section>
+
+    <section id="faq" class="panel" aria-hidden="true" role="tabpanel">
+      <h2>FAQ</h2>
+      <p>Perguntas frequentes e respostas rápidas para dúvidas comuns.</p>
+
+      <div class="accordion" aria-label="Perguntas frequentes">
+        <div class="acc-item">
+          <button class="acc-btn" aria-expanded="false">Como calibrar a porção?<span>+</span></button>
+          <div class="acc-panel" aria-hidden="true"><p>Use o menu de calibração no firmware e pese as porções.</p></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-btn" aria-expanded="false">Posso controlar por app?<span>+</span></button>
+          <div class="acc-panel" aria-hidden="true"><p>Sim — versões futuras incluem conectividade Wi‑Fi e app.</p></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Tabs: alterna painéis
+    const tabs = document.querySelectorAll('.tab');
+    const panels = document.querySelectorAll('.panel');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.setAttribute('aria-selected','false'));
+        tab.setAttribute('aria-selected','true');
+        const target = tab.dataset.target;
+        panels.forEach(p => {
+          p.setAttribute('aria-hidden', p.id === target ? 'false' : 'true');
+        });
+        const el = document.getElementById(target);
+        if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+      });
+    });
+
+    // Accordion: expande/colapsa
+    document.querySelectorAll('.acc-item').forEach(item => {
+      const btn = item.querySelector('.acc-btn');
+      const panel = item.querySelector('.acc-panel');
+      btn.addEventListener('click', () => {
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!expanded));
+        panel.setAttribute('aria-hidden', String(expanded));
+        btn.querySelector('span').textContent = expanded ? '+' : '−';
+      });
+    });
+
+    // Tema simples (persistência local)
+    const themeBtn = document.getElementById('toggleTheme');
+    const saved = localStorage.getItem('site-theme');
+    if(saved === 'dark'){ document.body.classList.add('dark'); themeBtn.setAttribute('aria-pressed','true') }
+    themeBtn.addEventListener('click', () => {
+      const isDark = document.body.classList.toggle('dark');
+      themeBtn.setAttribute('aria-pressed', String(isDark));
+      localStorage.setItem('site-theme', isDark ? 'dark' : 'light');
+    });
+
+    // Animação de entrada para cards
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.card').forEach((c,i) => {
+        c.style.animation = `fadeIn .28s ease ${i*60}ms both`;
+      });
+    });
+  </script>
+</body>
+</html>
